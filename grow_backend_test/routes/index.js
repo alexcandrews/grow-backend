@@ -35,6 +35,33 @@ router.get('/characters/:name', function(req, res, next) {
 
 });
 
+
+var sort_characters = function(sort_by, character_data) {
+	// sort by specified parameter
+	if (sort_by == 'height') {
+		character_data.sort(function(a, b) {
+			return a.height - b.height;
+		});
+	} else if (sort_by == 'mass') {
+		character_data.sort(function(a, b) {
+			return a.mass - b.mass;
+		});
+	} else if (sort_by == 'name') {
+		character_data.sort(function(a, b) {
+			var nameA = a.name.toUpperCase(); // ignore upper and lowercase
+			var nameB = b.name.toUpperCase(); // ignore upper and lowercase
+			if (nameA <= nameB) {
+				return -1;
+			}
+			if (nameA > nameB) {
+			    return 1;
+			}
+		});
+	}
+	// default return the same list
+	return character_data;
+};
+
 // GET all characters (truncate to just 50)
 router.get('/characters', function(req, res, next) {
 
@@ -56,7 +83,8 @@ router.get('/characters', function(req, res, next) {
 				}
 				// exit once we reach 50 characters
 				if(character_data.length == 50) {
-
+					// get sorted list
+					character_data = sort_characters(req.query.sort, character_data);
 	                res.send(character_data);
 	            } else {
 					get_character_data(page_counter + 1);
